@@ -1,0 +1,40 @@
+# Web Framework
+fastapi
+uvicorn[standard]
+python-multipart
+
+# LangChain & Ecosystem
+langchain
+langchain-community
+langchain-core
+
+
+# Vectorstore
+ chromadb
+
+# Embeddings
+sentence-transformers
+transformers
+
+# PDF Parsing
+PyPDF2  # backend for PyPDFLoader via langchain_community
+
+# Environment Variables
+python-dotenv
+
+# Typing & Utilities
+pydantic>=2.0,<3.0
+requests
+
+# Logging (optional but recommended)
+loguru
+
+# File Uploads
+aiofiles
+
+# Process
+tqdm
+
+
+
+#pip install -r requirements.txt
