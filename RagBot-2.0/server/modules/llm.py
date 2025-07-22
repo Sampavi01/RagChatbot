@@ -9,36 +9,27 @@ load_dotenv()
 # Use GEMINI_API_KEY instead of GOOGLE_API_KEY
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-def get_llm_chain(retriever):
+def get_llm_chain(retriever, llm):
     llm = ChatGoogleGenerativeAI(
         api_key=GEMINI_API_KEY,
-        model="gemini-2.0-flash",  # Updated model name
+        model="gemini-2.0-flash",
         temperature=0.0
     )
 
+    # ✅ FIXED PromptTemplate
     prompt = PromptTemplate(
         input_variables=["context", "question"],
         template="""
-You are **MediBot**, an AI-powered assistant trained to help users understand medical documents and health-related questions.
+You are a helpful AI assistant. Answer the user's question based only on the following context.
 
-Your job is to provide clear, accurate, and helpful responses based **only on the provided context**.
+If the answer is not contained within the text provided, say: "I could not find the answer in the provided documents."
+Do not make up information.
 
----
-
-🔍 **Context**:
+Context:
 {context}
 
-🙋‍♂️ **User Question**:
+Question: 
 {question}
-
----
-
-💬 **Answer**:
-- Respond in a calm, factual, and respectful tone.
-- Use simple explanations when needed.
-- If the context does not contain the answer, say: "I'm sorry, but I couldn't find relevant information in the provided documents."
-- Do NOT make up facts.
-- Do NOT give medical advice or diagnoses.
 """
     )
 
@@ -49,3 +40,4 @@ Your job is to provide clear, accurate, and helpful responses based **only on th
         chain_type_kwargs={"prompt": prompt},
         return_source_documents=True
     )
+
