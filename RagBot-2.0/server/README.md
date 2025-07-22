@@ -1,25 +1,27 @@
-# RagBot 2.0 Server
-
-## Overview
-RagBot 2.0 Server is a FastAPI-based backend for a Retrieval-Augmented Generation (RAG) chatbot. It enables document upload, vector store management, and intelligent question answering using state-of-the-art language models and embeddings.
+# 🚀 RagBot 2.0 Server
 
 ---
 
-## Features
-- **PDF Upload**: Upload multiple PDF files for knowledge ingestion.
-- **Vector Store**: Documents are embedded and stored using ChromaDB for efficient retrieval.
-- **Question Answering**: Ask questions and get context-aware answers powered by Gemini and HuggingFace embeddings.
-- **Robust Error Handling**: All endpoints are protected with middleware for clean error responses.
-- **CORS Support**: Ready for integration with any frontend.
-- **Background Processing**: Vector store updates run asynchronously for fast uploads.
+## 🧠 Overview
+RagBot 2.0 Server is a robust FastAPI backend for Retrieval-Augmented Generation (RAG) chatbots. It empowers users to upload documents, manage a vector store, and receive intelligent, context-aware answers using cutting-edge language models and embeddings.
 
 ---
 
-## API Endpoints
+## ✨ Features
+- **Seamless PDF Uploads**: Effortlessly ingest multiple PDF files to expand your knowledge base.
+- **Advanced Vector Store**: Documents are embedded and indexed using ChromaDB for lightning-fast retrieval.
+- **Smart Question Answering**: Get precise, context-driven answers powered by Gemini LLM and HuggingFace embeddings.
+- **Resilient Error Handling**: Middleware ensures clean, informative error responses for all endpoints.
+- **Universal CORS Support**: Integrate with any frontend, anywhere.
+- **Efficient Background Processing**: Vector store updates run asynchronously for a smooth user experience.
+
+---
+
+## 🔗 API Endpoints
 
 ### `POST /upload_pdfs/`
 Upload one or more PDF files. Files are saved and processed in the background.
-- **Request**: Multipart/form-data with files
+- **Request**: `multipart/form-data` with files
 - **Response**: JSON message indicating upload and processing status
 
 ### `POST /ask/`
@@ -33,7 +35,7 @@ Health check endpoint.
 
 ---
 
-## Technology Stack
+## 🛠️ Technology Stack
 - **FastAPI**: High-performance Python web framework
 - **LangChain**: Document processing, embeddings, and LLM orchestration
 - **ChromaDB**: Vector database for document retrieval
@@ -42,11 +44,11 @@ Health check endpoint.
 
 ---
 
-## Setup & Installation
+## ⚡ Quickstart
 
 1. **Clone the repository**
    ```sh
-   git clone <your-repo-url>
+   git clone <https://github.com/Sampavi01/RagChatbot.git>
    cd RagBot-2.0/server
    ```
 2. **Install dependencies**
@@ -63,7 +65,7 @@ Health check endpoint.
 
 ---
 
-## Folder Structure
+## 📁 Folder Structure
 ```
 server/
 ├── main.py              # FastAPI application
@@ -76,15 +78,12 @@ server/
 
 ---
 
-## Contributing
-Pull requests and issues are welcome! Please follow best practices and ensure all code is well-documented.
+## 🤝 Contributing
+We welcome pull requests and issues! Please follow best practices and ensure all code is well-documented. Your contributions help make RagBot better for everyone.
 
 ---
 
-## License
+## 📜 License
 This project is licensed under the MIT License.
 
----
-
-## Contact
-For questions or support, please contact the maintainer at [your-email@example.com].
+.

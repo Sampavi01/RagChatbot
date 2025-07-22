@@ -1,7 +1,22 @@
+"""
+upload.py
+---------
+Streamlit component for uploading PDF documents in RagBot 2.0 client.
+Provides a sidebar uploader and handles API calls to the backend for document ingestion.
+"""
+
 import streamlit as st
 from utils.api import upload_pdfs_api
 
 def render_uploader():
+    """
+    Render the sidebar PDF uploader and handle upload logic.
+
+    - Allows users to select and upload multiple PDF files.
+    - Calls the backend API to ingest documents.
+    - Displays upload status and error messages in the sidebar.
+    """
+
     st.sidebar.header("Upload PDFs")
     uploaded_files = st.sidebar.file_uploader(
         "Upload multiple PDFs", type="pdf", accept_multiple_files=True

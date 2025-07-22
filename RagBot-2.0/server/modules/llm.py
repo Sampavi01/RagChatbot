@@ -1,3 +1,9 @@
+"""
+llm.py
+--------
+Provides a function to build a Retrieval-Augmented Generation (RAG) chain using LangChain and Gemini LLM.
+Loads the Gemini API key from environment variables and constructs a QA chain with a custom prompt template.
+"""
 from langchain.prompts import PromptTemplate
 from langchain.chains import RetrievalQA
 from langchain_google_genai import ChatGoogleGenerativeAI
@@ -10,6 +16,16 @@ load_dotenv()
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 def get_llm_chain(retriever, llm):
+    """
+    Build a RetrievalQA chain using LangChain and Gemini LLM.
+
+    Args:
+        retriever: LangChain retriever object for document retrieval.
+        llm: Gemini LLM instance (not used, will be overwritten).
+
+    Returns:
+        RetrievalQA: LangChain RetrievalQA chain configured with Gemini LLM and a custom prompt.
+    """
     llm = ChatGoogleGenerativeAI(
         api_key=GEMINI_API_KEY,
         model="gemini-2.0-flash",

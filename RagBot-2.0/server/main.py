@@ -1,3 +1,20 @@
+"""
+main.py
+-------
+FastAPI application for RagBot 2.0 server.
+Handles PDF uploads, vector store management, and question answering using LangChain, ChromaDB, HuggingFace embeddings, and Gemini LLM.
+
+Endpoints:
+    - POST /upload_pdfs/: Upload and process PDF files asynchronously.
+    - POST /ask/: Ask questions based on uploaded documents.
+    - GET /test: Health check endpoint.
+
+Constants:
+    - UPLOAD_DIR: Directory for uploaded PDFs.
+    - PERSIST_DIR: Directory for ChromaDB persistence.
+    - COLLECTION_NAME: ChromaDB collection name.
+"""
+
 from fastapi import FastAPI, UploadFile, File, Form, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,16 +27,19 @@ from logger import logger
 from pathlib import Path  
 import os
 
-from langchain_community.vectorstores import Chroma
-
-from langchain_core.documents import Document
+# Use the recommended, non-deprecated Chroma class
+from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 
+# --- Define Constants in ONE place to ensure consistency ---
+UPLOAD_DIR = Path("./uploaded_pdfs")
+PERSIST_DIR = Path("./chroma_db")  # This MUST match the directory in load_vectorstore
+COLLECTION_NAME = "my_docs"     # This MUST match the collection in load_vectorstore
 
-from langchain_google_genai import ChatGoogleGenerativeAI  # Gemini API LLM
-UPLOAD_DIR = "./uploaded_pdfs"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-
+# Create directories if they don't exist
+UPLOAD_DIR.mkdir(exist_ok=True)
+PERSIST_DIR.mkdir(exist_ok=True)
 
 app = FastAPI(title="RagBot2.0")
 
@@ -55,13 +75,13 @@ async def upload_pdfs(
             if not safe_filename:
                 raise ValueError("Empty filename received")
 
-            save_path = Path(UPLOAD_DIR) / safe_filename
+            save_path = UPLOAD_DIR / safe_filename
             with open(save_path, "wb") as f:
                 f.write(contents)
-            saved_files.append(save_path)
+            saved_files.append(str(save_path))
 
-        # 🔄 Run load_vectorstore as background task
-        background_tasks.add_task(load_vectorstore, [str(f) for f in saved_files])
+        # Run load_vectorstore as background task
+        background_tasks.add_task(load_vectorstore, saved_files)
 
         logger.info("Vectorstore loading scheduled in background")
         return {"message": "Files uploaded. Vectorstore update is running in background."}
@@ -70,37 +90,37 @@ async def upload_pdfs(
         logger.exception("Error during PDF upload")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
+# --- CORRECTED AND REFACTORED /ask/ ENDPOINT ---
 @app.post("/ask/")
 async def ask_question(question: str = Form(...)):
     try:
-        logger.info(f"user query: {question}")
+        logger.info(f"User query: {question}")
 
-        # Load Chroma vectorstore from persistent directory
-        PERSIST_DIR = "chroma_persist"  # adjust if needed
-
-        embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-
-        vectorstore = Chroma(
-            persist_directory=PERSIST_DIR,
-            embedding_function=embedding_model,
-            collection_name="ragbot_collection"  # change as appropriate
+        # 1. Initialize the embedding model with the same stable configuration
+        embedding_model = HuggingFaceEmbeddings(
+            model_name="sentence-transformers/all-MiniLM-L6-v2",
+            model_kwargs={'device': 'cpu'}  # Added for stability and consistency
         )
 
-        # Create Gemini API LLM instance
-        llm = ChatGoogleGenerativeAI(
-            
-    api_key=os.getenv("GEMINI_API_KEY"),  # Make sure your env var is GOOGLE_API_KEY or change accordingly
-    model="gemini-2.0-flash"
-)
+        # 2. Load the vector store using the CORRECT directory and collection name
+        vectorstore = Chroma(
+            persist_directory=str(PERSIST_DIR),         
+            embedding_function=embedding_model,
+            collection_name=COLLECTION_NAME             
+        )
 
-        
+        # Create Gemini API LLM instance with clean indentation
+        llm = ChatGoogleGenerativeAI(
+            api_key=os.getenv("GEMINI_API_KEY"),
+            model="gemini-1.5-flash"  # Corrected to a valid model name
+        )
 
         # Get LangChain retriever from vectorstore
-        retriever = vectorstore.as_retriever()
+        retriever = vectorstore.as_retriever(search_kwargs={"k": 5}) # Retrieve top 5 chunks
 
         # Get your LLM + retrieval QA chain
-        chain = get_llm_chain(retriever)  # update your get_llm_chain to accept llm param if not done yet
+        # Make sure get_llm_chain is compatible with this setup
+        chain = get_llm_chain(retriever, llm) 
 
         # Query the chain
         result = query_chain(chain, question)

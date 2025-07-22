@@ -1,20 +1,22 @@
-# RagBot 2.0 Client
-
-## Overview
-RagBot 2.0 Client is the front-end and utility layer for interacting with the RagBot 2.0 Server. It provides a user-friendly interface for uploading documents, chatting with the RAG-powered bot, and managing conversation history.
+# ✨ RagBot 2.0 Client
 
 ---
 
-## Features
-- **Chat UI**: Modern interface for real-time conversations with the RAG chatbot.
-- **PDF Upload**: Upload documents to expand the bot's knowledge base.
-- **Conversation History**: Download and manage chat history for future reference.
-- **API Integration**: Seamless communication with the FastAPI backend.
-- **Configurable Settings**: Easily adjust client parameters via `config.py`.
+## 🧠 Overview
+RagBot 2.0 Client is a modern, user-friendly front-end for interacting with the RagBot 2.0 Server. Effortlessly upload documents, chat with your RAG-powered assistant, and manage your conversation history—all in one place.
 
 ---
 
-## Folder Structure
+## 🚀 Features
+- **Intuitive Chat UI**: Real-time, conversational interface for seamless interactions.
+- **Multi-PDF Upload**: Expand your bot's knowledge base with just a few clicks.
+- **History Download**: Save and manage your chat history for future reference.
+- **Robust API Integration**: Fast, reliable communication with the FastAPI backend.
+- **Easy Configuration**: Adjust client settings via `config.py` for a personalized experience.
+
+---
+
+## 📁 Folder Structure
 ```
 client/
 ├── app.py                # Main application entry point
@@ -31,7 +33,7 @@ client/
 
 ---
 
-## Setup & Installation
+## ⚡ Setup & Installation
 
 1. **Navigate to the client directory**
    ```sh
@@ -46,12 +48,12 @@ client/
 
 4. **Run the client application**
    ```sh
-   python app.py
+   streamlit run app.py
    ```
 
 ---
 
-## Usage
+## 💡 Usage
 - **Start the client**: Launch the app and interact with the chatbot.
 - **Upload PDFs**: Use the upload feature to add new documents.
 - **Chat**: Ask questions and receive intelligent answers.
@@ -59,22 +61,20 @@ client/
 
 ---
 
-## Technology Stack
+## 🛠️ Technology Stack
 - **Python**: Core programming language
 - **FastAPI**: Backend API integration
-- **Custom UI Components**: Built with Python for simplicity and extensibility
+- **Streamlit**: Interactive UI components
+- **Custom UI Components**: Built for simplicity and extensibility
 
 ---
 
-## Contributing
-Contributions are welcome! Please submit issues and pull requests for improvements or bug fixes.
+## 🤝 Contributing
+We welcome contributions! Please submit issues and pull requests for improvements or bug fixes. Help us make RagBot even better.
 
 ---
 
-## License
+## 📜 License
 This project is licensed under the MIT License.
 
----
 
-## Contact
-For support or questions, contact the maintainer at [your-email@example.com].

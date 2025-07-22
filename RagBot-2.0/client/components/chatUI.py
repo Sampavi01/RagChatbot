@@ -1,7 +1,22 @@
+"""
+chatUI.py
+---------
+Streamlit component for the RagBot 2.0 client chat interface.
+Renders chat history, handles user input, and displays responses from the backend RAG API.
+"""
+
 import streamlit as st
 from utils.api import ask_question
 
 def render_chat():
+    """
+    Render the chat interface for interacting with uploaded documents.
+
+    - Displays chat history from session state.
+    - Accepts user questions and sends them to the backend API.
+    - Shows assistant responses and document sources.
+    """
+
     st.subheader("💬 Chat with your documents")
 
     if "messages" not in st.session_state:

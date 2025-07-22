@@ -1,4 +1,9 @@
-import os
+"""
+load_vectorstore.py
+-------------------
+This module provides the function to process uploaded PDF files, split them into text chunks, clean the data, and store them in a Chroma vector database for retrieval-augmented generation (RAG) applications.
+"""
+
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -9,7 +14,19 @@ CHROMA_DIR = "./chroma_db"
 
 def load_vectorstore(uploaded_files: List[str]):
     """
-    Loads documents, splits them into chunks, cleans them, and adds them to a Chroma vector store.
+    Loads PDF documents, splits them into text chunks, cleans the chunks, and adds them to a Chroma vector store.
+
+    Args:
+        uploaded_files (List[str]): List of file paths to uploaded PDF documents.
+
+    Returns:
+        Chroma: A Chroma vector store populated with embedded document chunks, or None if no valid chunks are found.
+
+    Steps:
+        1. Initializes HuggingFace embedding model (CPU).
+        2. Loads and splits each PDF into text chunks.
+        3. Cleans chunks to remove empty/invalid content.
+        4. Adds valid chunks to ChromaDB for semantic search and retrieval.
     """
     # --- 1. INITIALIZE THE EMBEDDING MODEL (Correctly done) ---
     # This prevents the "meta tensor" error by specifying the device.
