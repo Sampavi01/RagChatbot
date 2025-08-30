@@ -10,6 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 import os
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 
 # Use GEMINI_API_KEY instead of GOOGLE_API_KEY
@@ -26,12 +27,6 @@ def get_llm_chain(retriever, llm):
     Returns:
         RetrievalQA: LangChain RetrievalQA chain configured with Gemini LLM and a custom prompt.
     """
-    llm = ChatGoogleGenerativeAI(
-        api_key=GEMINI_API_KEY,
-        model="gemini-2.0-flash",
-        temperature=0.0
-    )
-
     # ✅ FIXED PromptTemplate
     prompt = PromptTemplate(
         input_variables=["context", "question"],
@@ -50,10 +45,10 @@ Question:
     )
 
     return RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=retriever,
-        chain_type_kwargs={"prompt": prompt},
-        return_source_documents=True
+        llm=llm,                                  # LLM to generate answers
+        chain_type="stuff",                       # Stuff all context together into one input
+        retriever=retriever,                      # Use this retriever to fetch relevant chunks
+        chain_type_kwargs={"prompt": prompt},     # Use the custom prompt defined above
+        return_source_documents=True              # Also return which documents the answer came from
     )
 

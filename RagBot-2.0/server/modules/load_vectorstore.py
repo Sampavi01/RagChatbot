@@ -1,7 +1,7 @@
 """
 load_vectorstore.py
 -------------------
-This module provides the function to process uploaded PDF files, split them into text chunks, clean the data, and store them in a Chroma vector database for retrieval-augmented generation (RAG) applications.
+Process uploaded PDFs, split into text chunks, clean data, and store in Chroma vector database.
 """
 
 from langchain_community.document_loaders import PyPDFLoader
@@ -9,58 +9,52 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 from typing import List
+import torch
+import os
 
 CHROMA_DIR = "./chroma_db"
 
 def load_vectorstore(uploaded_files: List[str]):
     """
-    Loads PDF documents, splits them into text chunks, cleans the chunks, and adds them to a Chroma vector store.
+    Loads PDF documents, splits into text chunks, cleans chunks, and adds to Chroma vector store.
 
     Args:
         uploaded_files (List[str]): List of file paths to uploaded PDF documents.
 
     Returns:
-        Chroma: A Chroma vector store populated with embedded document chunks, or None if no valid chunks are found.
-
-    Steps:
-        1. Initializes HuggingFace embedding model (CPU).
-        2. Loads and splits each PDF into text chunks.
-        3. Cleans chunks to remove empty/invalid content.
-        4. Adds valid chunks to ChromaDB for semantic search and retrieval.
+        Chroma: Chroma vector store with embedded document chunks, or None if no valid chunks found.
     """
-    # --- 1. INITIALIZE THE EMBEDDING MODEL (Correctly done) ---
-    # This prevents the "meta tensor" error by specifying the device.
-    model_kwargs = {'device': 'cpu'}
-    hf_embedding_model = HuggingFaceEmbeddings(
+
+    # --- 1. INITIALIZE THE EMBEDDING MODEL SAFELY ON CPU ---
+    device = "cpu"
+    embedding_model = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2",
-        model_kwargs=model_kwargs
+        model_kwargs={
+            "device": device,
+            "torch_dtype": torch.float32,
+            "low_cpu_mem_usage": True
+        }
     )
-    
+
     # --- 2. LOAD AND SPLIT ALL DOCUMENTS ---
-    # This list will accumulate chunks from all processed PDF files.
     all_chunks = []
     for file_path in uploaded_files:
-        # The try...except block wraps each file's processing.
-        # This makes the function robust; it won't crash if one PDF is bad.
         try:
             print(f"Processing file: {file_path}")
             loader = PyPDFLoader(file_path)
             documents = loader.load()
-            
             print(f"Loaded {len(documents)} pages from {file_path}")
 
             splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
             chunks = splitter.split_documents(documents)
             all_chunks.extend(chunks)
         except Exception as e:
-            print(f"Error processing file {file_path}: {e}. Skipping this file.")
-            continue # This correctly skips to the next file in the loop.
+            print(f"Error processing {file_path}: {e}. Skipping this file.")
+            continue
 
     # --- 3. CLEAN THE COLLECTED CHUNKS ---
-    # This step is performed *after* all chunks have been collected.
-    # It removes any documents with empty or invalid content to prevent TypeErrors.
     if not all_chunks:
-        print("Warning: No chunks were generated from the uploaded files.")
+        print("Warning: No chunks generated from uploaded files.")
         return None
 
     cleaned_chunks = [
@@ -68,21 +62,24 @@ def load_vectorstore(uploaded_files: List[str]):
     ]
 
     if not cleaned_chunks:
-        print("Warning: No valid text chunks found after cleaning. ChromaDB will not be updated.")
+        print("Warning: No valid text chunks after cleaning. ChromaDB not updated.")
         return None
 
     print(f"Total valid chunks to embed after cleaning: {len(cleaned_chunks)}")
 
-    # --- 4. INITIALIZE AND POPULATE THE VECTOR STORE ---
-    # The Chroma vector store is created only after we have valid chunks to add.
+    # --- 4. INITIALIZE OR LOAD THE VECTOR STORE ---
+    os.makedirs(CHROMA_DIR, exist_ok=True)
     vector_store = Chroma(
         collection_name="my_docs",
-        embedding_function=hf_embedding_model,
+        embedding_function=embedding_model,
         persist_directory=CHROMA_DIR
     )
 
-    # Add only the cleaned, valid documents to the vector store.
+    # Add only cleaned chunks to Chroma
     vector_store.add_documents(cleaned_chunks)
+    vector_store.persist()  # persist changes to disk
 
     print("✅ ChromaDB update complete.")
     return vector_store
+
+     
